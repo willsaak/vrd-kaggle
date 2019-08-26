@@ -6,5 +6,7 @@ RUN python3 -m pip install pipenv
 COPY Pipfile /src/
 COPY Pipfile.lock /src/
 
+
 WORKDIR /src
-RUN pipenv install --dev
+ENV PYTHONPATH /src
+RUN pipenv install --deploy --ignore-pipfile --dev
