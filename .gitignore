@@ -111,6 +111,7 @@ data/*
 main/*/graph
 weights/*
 logs/*
+debug/*
 
 # vim swap files
 *.swp
