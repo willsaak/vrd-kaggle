@@ -3,12 +3,9 @@ import keras
 from tensorflow.python.keras.applications.inception_resnet_v2 import InceptionResNetV2
 
 
-def get_is_classifier(image_size, num_of_labels, num_of_classes):
-    image_shape = (image_size[0], image_size[1], 3)
-    label_shape = (num_of_labels,)
-
+def get_is_classifier(image_shape, num_of_labels, num_of_classes):
     image_input = keras.layers.Input(shape=image_shape)
-    label_input = keras.layers.Input(shape=label_shape)
+    label_input = keras.layers.Input(shape=(num_of_labels,))
 
     net = InceptionResNetV2(
         include_top=False,

@@ -14,6 +14,7 @@ pillow = "*"
 scikit-image = "*"
 tqdm = "*"
 dataclasses = "*"
+scikit-learn = "*"
 
 [requires]
 python_version = "3.6"
