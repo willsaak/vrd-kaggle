@@ -6,7 +6,6 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-opencv-python = "*"
 numpy = "*"
 tensorflow-gpu = "==1.14.0"
 keras = "*"
@@ -14,6 +13,7 @@ pillow = "*"
 scikit-image = "*"
 tqdm = "*"
 dataclasses = "*"
+keras-retinanet = "*"
 
 [requires]
 python_version = "3.6"

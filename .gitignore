@@ -110,3 +110,6 @@ venv.bak/
 data/*
 main/*/graph
 weights/*
+
+# vim swap files
+*.swp

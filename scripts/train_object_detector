@@ -1,0 +1,3 @@
+#!/bin/bash
+
+retinanet-train csv annotations/retinanet_new_labels.csv annotations/retinanet_used_classes.csv
