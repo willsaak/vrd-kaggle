@@ -45,4 +45,4 @@ if __name__ == "__main__":
     detection_output = detector.detect(
         "/mnt/renumics-research/datasets/vis-rel-data/img/0000575f5a03db70.jpg"
     )
-    visualize(detection_output, "snapshots/vis.png")
+    visualize(detection_output, "snapshots/output.png")
