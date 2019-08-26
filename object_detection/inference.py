@@ -10,4 +10,3 @@ def load_model():
 
 def detect_objects(images: List[PathLike]) -> List[DetectionOutput]:
     model = load_model()
-    ...
