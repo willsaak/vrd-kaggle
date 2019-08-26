@@ -1,0 +1,6 @@
+#!/bin/bash
+
+OPEN_IMAGES_WEIGHTS=weights/retinanet_resnet152_level_1_v1.2.h5
+
+[ -f "$OPEN_IMAGES_WEIGHTS" ] || curl https://github.com/ZFTurbo/Keras-RetinaNet-for-Open-Images-Challenge-2018/releases/download/v1.2/retinanet_resnet152_level_1_v1.2.h5 > "$OPEN_IMAGES_WEIGHTS"
+pipenv run retinanet-train --weights "$OPEN_IMAGES_WEIGHTS" csv annotations/retinanet_new_labels.csv annotations/retinanet_used_classes.csv

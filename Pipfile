@@ -4,9 +4,9 @@ name = "pypi"
 verify_ssl = true
 
 [dev-packages]
+ipython = "*"
 
 [packages]
-opencv-python = "*"
 numpy = "*"
 tensorflow-gpu = "==1.14.0"
 keras = "*"
@@ -15,6 +15,7 @@ scikit-image = "*"
 tqdm = "*"
 dataclasses = "*"
 scikit-learn = "*"
+keras-retinanet = "*"
 
 [requires]
 python_version = "3.6"
