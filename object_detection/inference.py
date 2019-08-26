@@ -14,18 +14,21 @@ MODEL_PATH = "weights/retinanet_resnet152_level_1_v1.2-inference.h5"
 
 
 class ObjectDetector:
-    def __init__(self):
+    def __init__(self, debug=False):
         config = tf.ConfigProto()
         config.gpu_options.allow_growth = True
         keras.backend.tensorflow_backend.set_session(tf.Session(config=config))
 
         self.model = load_model(MODEL_PATH)
+        self.debug = debug
 
     def detect(self, image_path: PathLike) -> DetectionOutput:
         image = read_image_bgr(image_path)
-        cv2.imwrite("snapshots/input_rgb.png", image)
+        if self.debug:
+            cv2.imwrite("debug/input_rgb.png", image)
         image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-        cv2.imwrite("snapshots/input_bgr.png", image)
+        if self.debug:
+            cv2.imwrite("debug/input_bgr.png", image)
         image = preprocess_image(image)
         image, scale = resize_image(image)
         boxes, scores, labels = self.model.predict_on_batch(
@@ -45,4 +48,5 @@ if __name__ == "__main__":
     detection_output = detector.detect(
         "/mnt/renumics-research/datasets/vis-rel-data/img/0000575f5a03db70.jpg"
     )
-    visualize(detection_output, "snapshots/output.png")
+    if self.debug:
+        visualize(detection_output, "debug/output.png")
