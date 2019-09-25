@@ -1,29 +1,35 @@
-import os
-import keras
-import math
-import numpy as np
 import cv2
+import keras
+import numpy as np
+import os
+from keras import optimizers
+from keras.callbacks import ModelCheckpoint, EarlyStopping, TensorBoard
 from sklearn.model_selection import train_test_split
-from typing import List, Callable, Dict, Tuple, Optional, Collection
+from typing import Optional
 
-from tensorflow.python.keras.applications.inception_resnet_v2 import preprocess_input
-from is_classification.model import get_is_classifier
 from data.data_sequence import DataSequence
+from is_classification.inception_resnet_v2 import InceptionResNetV2
 
-labels_csv = '../annotations/is_labels.csv'
+# backend.set_session(
+#     session=tf.Session(
+#         config=tf.ConfigProto(
+#             gpu_options=tf.GPUOptions(
+#                 allow_growth=True))))
+
+labels_csv = '../annotations/is_labels_and_none.csv'
 imgs_path = '/mnt/renumics-research/datasets/vis-rel-data/img'
 
 labels_names = ['/m/0cvnqh', '/m/01mzpv', '/m/080hkjn', '/m/0342h', '/m/02jvh9', '/m/04bcr3', '/m/0dt3t', '/m/01940j',
                 '/m/071p9', '/m/03ssj5', '/m/04dr76w', '/m/01y9k5', '/m/026t6', '/m/05r5c', '/m/03m3pdh', '/m/01_5g',
                 '/m/078n6m', '/m/01s55n', '/m/04ctx', '/m/0584n8', '/m/0cmx8', '/m/02p5f1q', '/m/07y_7']
-classes_names = ['/m/02gy9n', '/m/05z87', '/m/0dnr7', '/m/04lbp', '/m/083vt']
+classes_names = ['none', '/m/02gy9n', '/m/05z87', '/m/0dnr7', '/m/04lbp', '/m/083vt']
 
 IMAGE_SIZE = (299, 299)
 NUM_OF_LABELS = len(labels_names)
 NUM_OF_CLASSES = len(classes_names)
 
 VAL_SIZE = 0.2
-BATCH_SIZE = 32
+BATCH_SIZE = 16
 
 
 def batch_annotation_to_input(batch_annotation,
@@ -32,7 +38,7 @@ def batch_annotation_to_input(batch_annotation,
     batch_images = np.stack([annotation[0][0] for annotation in batch])
     batch_labels = np.stack([annotation[0][1] for annotation in batch])
     batch_classes = np.stack([annotation[1] for annotation in batch])
-    return (batch_images, batch_labels), batch_classes
+    return [batch_images, batch_labels], batch_classes
 
 
 def annotation_to_input(annotation, augmenter: Optional[keras.preprocessing.image.ImageDataGenerator] = None):
@@ -87,5 +93,51 @@ train_augmenter = keras.preprocessing.image.ImageDataGenerator(
 train_generator = DataSequence(train_annotations, batch_size=BATCH_SIZE, shuffle=True,
                                map_fn=lambda x: batch_annotation_to_input(x, train_augmenter))
 val_generator = DataSequence(val_annotations, batch_size=BATCH_SIZE, shuffle=False, map_fn=batch_annotation_to_input)
-for a in train_generator:
-    print()
+
+image_shape = (IMAGE_SIZE[0], IMAGE_SIZE[1], 3)
+model = InceptionResNetV2(include_top=True, weights='imagenet', labels=NUM_OF_LABELS, classes=NUM_OF_CLASSES,
+                          input_shape=image_shape)
+
+model.summary()
+
+loss_checkpointer = ModelCheckpoint(
+    filepath="../weights/is_classifier_best_model.hdf5",
+    monitor='loss',
+    verbose=1,
+    save_best_only=True,
+    save_weights_only=False,
+    mode='auto',
+    period=1
+)
+early_stopping = EarlyStopping(
+    monitor='val_loss',
+    min_delta=0,
+    patience=5,
+    verbose=1,
+    mode='auto',
+    baseline=None,
+    restore_best_weights=True
+)
+tensorboard_callback = TensorBoard(
+    log_dir='./graph',
+    histogram_freq=0,
+    write_graph=True,
+    write_images=True
+)
+
+model.compile(loss='categorical_crossentropy',
+              optimizer=optimizers.Adam(),
+              metrics=['acc'])
+
+# Train the model
+history = model.fit_generator(
+    train_generator,
+    steps_per_epoch=len(train_generator),
+    epochs=50,
+    validation_data=val_generator,
+    validation_steps=len(val_generator),
+    verbose=1,
+    callbacks=[loss_checkpointer, early_stopping, tensorboard_callback])
+
+# Save the model
+model.save('../weights/is_classifier_last.h5')

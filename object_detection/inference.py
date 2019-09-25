@@ -6,8 +6,8 @@ import numpy as np
 import cv2
 from keras_retinanet.models import load_model
 from keras_retinanet.utils.image import read_image_bgr, preprocess_image, resize_image
-from output import DetectionOutput, BBox, Detection
-from visualization import visualize
+from .output import DetectionOutput, BBox, Detection
+from .visualization import visualize
 
 
 MODEL_PATH = "weights/retinanet_resnet152_level_1_v1.2-inference.h5"

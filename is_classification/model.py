@@ -9,9 +9,9 @@ def get_is_classifier(image_shape, num_of_labels, num_of_classes):
 
     net = InceptionResNetV2(
         include_top=False,
-        weights='imagenet',
-        input_tensor=image_input,
-        # input_shape=(IMAGE_SIZE[0], IMAGE_SIZE[1], 3)
+        weights=None,
+        # input_tensor=image_input,
+        input_shape=image_shape,
         pooling='avg'
     )
 

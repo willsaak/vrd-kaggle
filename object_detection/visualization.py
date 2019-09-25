@@ -6,7 +6,7 @@ from keras_retinanet.utils.image import read_image_bgr, preprocess_image, resize
 from keras_retinanet.utils.visualization import draw_box, draw_caption
 from keras_retinanet.utils.colors import label_color
 
-from output import DetectionOutput
+from .output import DetectionOutput
 
 
 def visualize(output: DetectionOutput, image_path: PathLike):
