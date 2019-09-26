@@ -112,5 +112,6 @@ weights/*
 logs/*
 debug/*
 is_classification/graph/*
+relationship_detector/graph/*
 # vim swap files
 *.swp
