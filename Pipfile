@@ -8,7 +8,7 @@ ipython = "*"
 
 [packages]
 numpy = "*"
-tensorflow-gpu = "==1.12.0"
+tensorflow-gpu = "==1.14.0"
 keras = "==2.2.4"
 pillow = "*"
 scikit-image = "*"
