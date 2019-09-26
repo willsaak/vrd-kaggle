@@ -101,7 +101,7 @@ model = InceptionResNetV2(include_top=True, weights='imagenet', labels=NUM_OF_LA
 model.summary()
 
 loss_checkpointer = ModelCheckpoint(
-    filepath="../weights/is_classifier_best_model.hdf5",
+    filepath="../weights/is_classifier_best_model_weighted.hdf5",
     monitor='loss',
     verbose=1,
     save_best_only=True,
@@ -137,7 +137,8 @@ history = model.fit_generator(
     validation_data=val_generator,
     validation_steps=len(val_generator),
     verbose=1,
-    callbacks=[loss_checkpointer, early_stopping, tensorboard_callback])
+    callbacks=[loss_checkpointer, early_stopping, tensorboard_callback],
+    class_weight={0: 0.5, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1})
 
 # Save the model
-model.save('../weights/is_classifier_last.h5')
+model.save('../weights/is_classifier_last_weighted.h5')
