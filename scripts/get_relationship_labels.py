@@ -2,8 +2,10 @@ import os
 
 from tqdm import tqdm
 
+# source_path = '/mnt/renumics-research/datasets/vis-rel-data/annotations/train-vrd.csv'
 source_path = '/mnt/renumics-team/ml-competitions/data/datasets/train/challenge-2019-train-vrd.csv'
 target_path = '../annotations/relationship_labels.csv'
+# target_path = '../annotations/relationship_labels_and_none.csv'
 imgs_path = '/mnt/renumics-research/datasets/vis-rel-data/img'
 
 # first_labels = ['/m/0bt9lr', '/m/04dr76w', '/m/04yx4', '/m/0dt3t', '/m/09tvcd',
@@ -18,8 +20,6 @@ imgs_path = '/mnt/renumics-research/datasets/vis-rel-data/img'
 #                  '/m/019w40', '/m/03k3r', '/m/03m3pdh', '/m/078jl', '/m/0h2r6',
 #                  '/m/0wdt60w', '/m/0l14j_', '/m/080hkjn', '/m/0cvnqh', '/m/01226z',
 #                  '/m/0342h', '/m/0k4j', '/m/02jvh9']
-
-
 pairs = ['/m/04yx4,/m/03k3r', '/m/04yx4,/m/04bcr3', '/m/01bl7v,/m/01y9k5', '/m/05r655,/m/0199g',
          '/m/04yx4,/m/09tvcd', '/m/05r655,/m/0hg7b', '/m/01bl7v,/m/078jl', '/m/05r655,/m/0dt3t',
          '/m/03bt1vf,/m/0342h', '/m/04yx4,/m/0dv9c', '/m/03bt1vf,/m/080hkjn', '/m/03bt1vf,/m/019w40',
@@ -61,53 +61,70 @@ pairs = ['/m/04yx4,/m/03k3r', '/m/04yx4,/m/04bcr3', '/m/01bl7v,/m/01y9k5', '/m/0
          '/m/09tvcd,/m/04bcr3', '/m/04yx4,/m/0cvnqh', '/m/03bt1vf,/m/0k4j', '/m/03bt1vf,/m/078n6m',
          '/m/04yx4,/m/07y_7', '/m/04yx4,/m/01940j', '/m/0bt9lr,/m/0cvnqh', '/m/04yx4,/m/0hg7b',
          '/m/04yx4,/m/05_5p_0', '/m/04yx4,/m/0h2r6', '/m/03bt1vf,/m/02jvh9', '/m/03bt1vf,/m/02p5f1q']
-pairs = []
-with open(source_path) as source:
-    for row in tqdm(source):
-        cols = row.split(',')
-        if os.path.isfile(os.path.join(imgs_path, cols[0] + '.jpg')):
-            if cols[-1] != 'is\n':
-                pairs.append(','.join(cols[1:3]))
-print()
 
-# labels_names = ['/m/0cvnqh', '/m/01mzpv', '/m/080hkjn', '/m/0342h', '/m/02jvh9', '/m/04bcr3', '/m/0dt3t', '/m/01940j',
-#                 '/m/071p9', '/m/03ssj5', '/m/04dr76w', '/m/01y9k5', '/m/026t6', '/m/05r5c', '/m/03m3pdh', '/m/01_5g',
-#                 '/m/078n6m', '/m/01s55n', '/m/04ctx', '/m/0584n8', '/m/0cmx8', '/m/02p5f1q', '/m/07y_7']
-#
-#
-# def get_is_labels():
-#     lines = []
-#     with open(source_path) as source, open(target_path, 'w') as target:
-#         for row in tqdm(source):
-#             cols = row.split(',')
-#             if 'is' in cols[-1]:
-#                 # if os.path.isfile(os.path.join(imgs_path, cols[0] + '.jpg')):
-#                 lines.append(cols)
-#                 target.write(row)
-#
-#
-# def get_none_labels():
-#     is_labels = []
-#     with open(target_path) as target:
-#         for row in tqdm(target):
-#             line = row.split(',')
-#             is_labels.append(','.join(line[0:2] + line[3:7]))
-#     none_labels = []
-#     with open(source_path) as source:
-#         for row in tqdm(source):
-#             cols = row.split(',')
-#             if os.path.isfile(os.path.join(imgs_path, cols[0] + '.jpg')) and cols[-1] != 'is\n':
-#                 if cols[1] in labels_names:
-#                     line = ','.join(cols[0:2] + cols[3:7])
-#                     if line not in is_labels:
-#                         none_labels.append(','.join(cols[0:2] + ['none'] + cols[3:7] + cols[3:7] + ['is\n']))
-#                 if cols[2] in labels_names:
-#                     line = ','.join([cols[0]] + [cols[2]] + cols[7:11])
-#                     if line not in is_labels:
-#                         none_labels.append(','.join([cols[0]] + [cols[2]] + ['none'] + cols[7:11] + cols[7:11] + ['is\n']))
-#     with open(target_path, 'a') as target:
-#         for line in tqdm(none_labels):
-#             target.write(line)
-#
-#
+relationships = ('at\n', 'holds\n', 'on\n', 'under\n', 'wears\n',
+                 'plays\n', 'hits\n', 'interacts_with\n', 'inside_of\n')
+
+
+def get_relationship_labels():
+    with open(source_path) as source, open(target_path, 'w') as target:
+        source.readline()
+        for row in tqdm(source):
+            cols = row.split(',')
+            if cols[-1] in relationships:
+                if os.path.isfile(os.path.join(imgs_path, cols[0] + '.jpg')):
+                    target.write(row)
+
+
+def get_none_labels():
+    relationship_labels = []
+    with open(target_path) as target:
+        for row in tqdm(target):
+            relationship_labels.append(','.join(row.split(',')[:-1]))
+
+    all_objects = {}
+    with open(source_path) as source:
+        for row in tqdm(source):
+            cols = row.split(',')
+            if os.path.isfile(os.path.join(imgs_path, cols[0] + '.jpg')):
+                if cols[-1] == 'is\n':
+                    image_name = cols[0]
+                    if image_name in all_objects.keys():
+                        all_objects[image_name].append(','.join([cols[1]] + cols[3:7]))
+                    else:
+                        all_objects[image_name] = [','.join([cols[1]] + cols[3:7])]
+                elif cols[-1] in relationships:
+                    image_name = cols[0]
+                    if image_name in all_objects.keys():
+                        all_objects[image_name].append(','.join([cols[1]] + cols[3:7]))
+                        all_objects[image_name].append(','.join([cols[2]] + cols[7:11]))
+                    else:
+                        all_objects[image_name] = [','.join([cols[1]] + cols[3:7])]
+                        all_objects[image_name] = [','.join([cols[2]] + cols[7:11])]
+
+    lines = []
+    for image_name, objects in all_objects.items():
+        for first in objects:
+            first = first.split(',')
+            for second in objects:
+                print(first, second)
+                second = second.split(',')
+                if ','.join([first[0], second[0]]) in pairs:
+                    row = ','.join([image_name, first[0], second[0], *first[1:], *second[1:]])
+                    lines.append(row)
+                elif ','.join([second[0], first[0]]) in pairs:
+                    row = ','.join([image_name, second[0], first[0], *second[1:], *first[1:]])
+                    lines.append(row)
+
+    none_lines = []
+    for row in lines:
+        if row not in relationship_labels:
+            none_lines.append(row + ',none\n')
+
+    with open(target_path, 'a') as target:
+        for line in tqdm(none_lines):
+            target.write(line)
+
+
+get_relationship_labels()
 # get_none_labels()
