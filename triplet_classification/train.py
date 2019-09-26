@@ -5,7 +5,7 @@ import os
 from sklearn.model_selection import train_test_split
 from typing import List, Optional, Tuple
 
-import relationship_detector.config as config
+import triplet_classification.config as config
 from data.data_sequence import DataSequence
 from models.inception_resnet_v2 import InceptionResNetV2
 
