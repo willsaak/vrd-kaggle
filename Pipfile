@@ -16,6 +16,9 @@ tqdm = "*"
 dataclasses = "*"
 scikit-learn = "*"
 keras-retinanet = "*"
+kaggle = "*"
+ipython = "*"
+kaggle-cli = "*"
 
 [requires]
 python_version = "3.6"

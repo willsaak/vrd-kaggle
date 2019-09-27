@@ -23,6 +23,6 @@ def visualize(output: DetectionOutput, image_path: PathLike):
         ).astype(int)
 
         draw_box(canvas, box, color=(0, 255, 0))
-        caption = f"{detection.klass} {detection.confidence:.3f}"
+        caption = f"{detection.label} {detection.confidence:.3f}"
         draw_caption(canvas, box, caption)
         cv2.imwrite(image_path, canvas)

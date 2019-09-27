@@ -13,7 +13,7 @@ class BBox:
 @dataclass
 class Detection:
     bbox: BBox
-    klass: str
+    label: str
     confidence: float
 
 
